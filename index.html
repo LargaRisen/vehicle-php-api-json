@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/jquery.min.js"></script>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/fetch.css">
+    <title>Fetch Data</title>
+</head>
+<body>
+    <div id="wrapper" class="container-lg">
+		<div class="page-title">
+			<h2>vehicle management</h2>
+		</div>
+		<div class="page-button">
+			<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" id="btn-add">Add</button>
+		</div>		
+		<div class="table-responsive">
+			<table class="table table-hover align-middle" id="table">
+				<thead id="table-title" class="table-light">
+				<tr>
+					<th scope="col">id</th>
+					<th scope="col">manuactor</th>
+					<th scope="col">typ</th>
+					<th scope="col">ps</th>
+					<th scope="col">operation</th>
+				</tr>
+				</thead>
+				<tbody id="table-content">
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+
+<!-- Add Button Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hiddden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-titile fs-5" id="myModalLabel">Add New Vehicle</h4>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form>
+					<div class="mb-3">
+						<label for="FormControlInput" class="form-label">Manuactor</label>
+						<input type="text" class="form-control" name="manuactor" id="manuactor" placeholder="Please enter manuactor">
+					</div>
+					<div class="mb-3">
+						<label for="FormControlInput" class="form-label">Typ</label>
+						<input type="text" class="form-control" name="typ" id="typ" placeholder="Please enter typ">
+					</div>
+					<div class="mb-3">
+						<label for="FormControlInput" class="form-label">Ps</label>
+						<input type="text" class="form-control" name="ps" id="ps" placeholder="Please enter ps">
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="button-add">Add</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Edit Button Modal -->
+<div class="modal fade" id="myModalEdit" tabindex="-1" aria-labelledby="myModalLabel" aria-hiddden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-titile fs-5" id="myModalLabel">Edit Vehicle</h4>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form>
+					<div class="mb-3">
+						<label for="FormControlInput" class="form-label">Id</label>
+						<input type="text" class="form-control" name="manuactor" id="id-edit" disabled>
+					</div>
+					<div class="mb-3">
+						<label for="FormControlInput" class="form-label">Manuactor</label>
+						<input type="text" class="form-control" name="manuactor" id="manuactor-edit">
+					</div>
+					<div class="mb-3">
+						<label for="FormControlInput" class="form-label">Typ</label>
+						<input type="text" class="form-control" name="typ" id="typ-edit">
+					</div>
+					<div class="mb-3">
+						<label for="FormControlInput" class="form-label">Ps</label>
+						<input type="text" class="form-control" name="ps" id="ps-edit">
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="button-edit">Edit</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	// get data
+	var action = 'get';
+	var obj = {
+		"action":action
+	};
+	// console.log('obj');
+	// console.log(obj);
+	// console.log(JSON.stringify(obj));
+	$.ajax({
+		type:"POST",
+		url:"load.php",
+		data:JSON.stringify(obj),
+		dataType:"json",
+		async:'true',
+		success:function(res){
+			// console.log(res);
+			var data = res.data;
+			// console.log(data);
+			var htmls;
+			for(var i=0; i<data.length; i++){
+				htmls = "<tr>" +
+						"<th scope='row'>" + data[i].id + "</th> + " +
+						"<td>" + data[i].manuactor + "</td> + " +
+						"<td>" + data[i].typ + "</td> + " +
+						"<td>" + data[i].ps + "</td> + " +
+						"<td><button type='button' class='btn btn-outline-success' data-bs-toggle='modal' data-bs-target='#myModalEdit' onclick='edit("+data[i].id+")' id="+data[i].id+" value="+data[i].id+">edit</button><button type='button' class='btn btn-outline-danger' onclick='del("+data[i].id+")' id="+data[i].id+" value="+data[i].id+">delete</button></td>"
+						+ "<tr>";
+				$("#table-content").append(htmls);
+			}
+		}
+	})
+
+	// add data
+	$("#button-add").click(function(){
+		// console.log(obj);
+		var manuactor = $("#manuactor").val();
+		var typ = $("#typ").val();
+		var ps = $("#ps").val();
+		var action = 'update';
+		var obj = {
+				"action":action,
+				"manuactor":manuactor,
+				"typ":typ,
+				"ps":ps
+			};
+		// console.log(manuactor,typ,ps);
+
+		$.ajax({
+			type:"post",
+			url:"load.php",
+			data:JSON.stringify(obj),
+			dataType:"json",
+			async:true,
+			success:function(res){
+				// console.log(res);
+				$("#table-content").empty()
+				var data = res.data;
+				var htmls;
+				for(var i=0; i<data.length; i++){
+					htmls = "<tr>" +
+							"<td>" + data[i].id + "</td> + " +
+							"<td>" + data[i].manuactor + "</td> + " +
+							"<td>" + data[i].typ + "</td> + " +
+							"<td>" + data[i].ps + "</td> + " +
+							"<td><button type='button' class='btn btn-outline-success' data-bs-toggle='modal' data-bs-target='#myModalEdit' onclick='edit("+data[i].id+")' id="+data[i].id+" value="+data[i].id+">edit</button><button type='button' class='btn btn-outline-danger' onclick='del("+data[i].id+")' id="+data[i].id+" value="+data[i].id+">delete</button></td>"
+							+ "<tr>";
+					$("#table-content").append(htmls);
+				}
+			}
+		})
+	})
+
+	// Edit data Msg
+	function edit(e){
+		var id = e;
+		var action = 'create';
+		var obj = {
+			"action":action,
+			"id":id
+		};
+		// console.log('obj');
+
+		$.ajax({
+			type:"POST",
+			url:"load.php",
+			data:JSON.stringify(obj),
+			dataType:"json",
+			async:'true',
+			success:function(res){
+				var data = res.data;
+				$('#id-edit').attr('value',data[0].id)
+				$('#manuactor-edit').attr('value',data[0].manuactor)
+				$('#typ-edit').attr('value',data[0].typ)
+				$('#ps-edit').attr('value',data[0].ps)
+				// console.log(res);
+			}
+		})
+	}
+
+	// Edit data
+	$("#button-edit").click(function(){
+		// console.log(obj);
+		var id = $("#id-edit").val();
+		var manuactor = $("#manuactor-edit").val();
+		var typ = $("#typ-edit").val();
+		var ps = $("#ps-edit").val();
+		var action = 'update';
+		var obj = {
+				"action":action,
+				"id":id,
+				"manuactor":manuactor,
+				"typ":typ,
+				"ps":ps
+			};
+		// console.log(manuactor,typ,ps);
+
+		$.ajax({
+			type:"post",
+			url:"load.php",
+			data:JSON.stringify(obj),
+			dataType:"json",
+			async:true,
+			success:function(res){
+				// console.log(res);
+				$("#table-content").empty()
+				var data = res.data;
+				var htmls;
+				for(var i=0; i<data.length; i++){
+					htmls = "<tr>" +
+							"<td>" + data[i].id + "</td> + " +
+							"<td>" + data[i].manuactor + "</td> + " +
+							"<td>" + data[i].typ + "</td> + " +
+							"<td>" + data[i].ps + "</td> + " +
+							"<td><button type='button' class='btn btn-outline-success' data-bs-toggle='modal' data-bs-target='#myModalEdit' onclick='edit("+data[i].id+")' id="+data[i].id+" value="+data[i].id+">edit</button><button type='button' class='btn btn-outline-danger' onclick='del("+data[i].id+")' id="+data[i].id+" value="+data[i].id+">delete</button></td>"
+							+ "<tr>";
+					$("#table-content").append(htmls);
+				}
+			}
+		})
+	})
+
+	// delete data
+	function del(e){
+		if (confirm("Are you sure to delete this message?")){
+			var id = e;
+			var action = 'delete';
+			var obj = {
+				"action":action,
+				"id":id
+			};
+			// console.log('obj');
+
+			$.ajax({
+				type:"POST",
+				url:"load.php",
+				data:JSON.stringify(obj),
+				dataType:"json",
+				async:'true',
+				success:function(res){
+					// console.log(res);
+					$("#table-content").empty()
+					var data = res.data;
+					// console.log(data);
+					var htmls;
+					for(var i=0; i<data.length; i++){
+						htmls = "<tr>" +
+								"<td>" + data[i].id + "</td> + " +
+								"<td>" + data[i].manuactor + "</td> + " +
+								"<td>" + data[i].typ + "</td> + " +
+								"<td>" + data[i].ps + "</td> + " +
+								"<td><button type='button' class='btn btn-outline-success' data-bs-toggle='modal' data-bs-target='#myModalEdit' onclick='edit("+data[i].id+")' id="+data[i].id+" value="+data[i].id+">edit</button><button type='button' class='btn btn-outline-danger' onclick='del("+data[i].id+")' id="+data[i].id+" value="+data[i].id+">delete</button></td>"
+								+ "<tr>";
+						$("#table-content").append(htmls);
+					}
+				}
+			})
+		}
+	}
+
+	// $('#MyModal').on('hidden.bs.modal', function () {
+	// 	console.log('fix me');
+	// 	$(this).find('form').trigger('reset');
+	// })
+
+</script>
+
+</html>

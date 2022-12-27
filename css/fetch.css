@@ -1,0 +1,13 @@
+.page-title{
+    margin: 40px;
+}
+.page-title h2 {
+    text-align: center;
+}
+.page-button button{
+    margin-bottom: 10px;
+
+}
+td button{
+    margin: 0 4px;
+}
